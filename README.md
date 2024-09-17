@@ -59,9 +59,9 @@ After a review session, you can update the card's progress. If the user answers 
 
 ```swift
 leitnerSystem.updateCard(card, correct: true)
-Reviewing Due Cards
-You can fetch cards that are due for review. The method returns cards whose next review date is today or earlier.
 ```
+### Reviewing Due Cards
+You can fetch cards that are due for review. The method returns cards whose next review date is today or earlier.
 
 ```swift
 let dueCards = leitnerSystem.dueForReview(limit: 10)
