@@ -7,13 +7,13 @@
 
 import Foundation
 
-struct Word {
-    let word: String
-    let languageCode: String
-    let meaning: String
-    let exampleSentence: String?
+public struct Word {
+    public let word: String
+    public let languageCode: String
+    public let meaning: String
+    public let exampleSentence: String?
     
-    init(
+    public init(
         word: String,
         languageCode: String,
         meaning: String,
