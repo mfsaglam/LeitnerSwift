@@ -7,7 +7,7 @@
 
 import Foundation
 
-class LeitnerSystem {
+public class LeitnerSystem {
     private(set) var boxes: [Box]
     
     /// Initializes the Leitner system with a specified number of boxes.
@@ -17,7 +17,7 @@ class LeitnerSystem {
     ///
     /// - Parameter boxAmount: The number of boxes to create. Defaults to 5.
     ///   Must be at least 2 to ensure the system works as expected.
-    init(boxAmount: UInt = 5) {
+    public init(boxAmount: UInt = 5) {
         let boxCount = max(2, Int(boxAmount))  // Ensure at least 2 boxes
         let reviewIntervals = LeitnerSystem.generateReviewIntervals(for: boxCount)
         
@@ -34,7 +34,7 @@ class LeitnerSystem {
     /// The card will always start in the first box, and its progress will be tracked from there.
     ///
     /// - Parameter card: The `Card` object to be added to the first box for review.
-    func addCard(_ card: Card) {
+    public func addCard(_ card: Card) {
         boxes[0].cards.append(card)  // Start card in the first box
     }
     
@@ -44,7 +44,7 @@ class LeitnerSystem {
     /// - Parameters:
     ///   - card: The `Card` object to be updated. This is passed as an inout parameter to allow modification.
     ///   - correct: A Boolean indicating whether the user's answer was correct. If `true`, the card progresses to the next box; if `false`, it returns to the first box.
-    func updateCard(_ card: Card, correct: Bool) {
+    public func updateCard(_ card: Card, correct: Bool) {
         // Find the card's current box
         for (boxIndex, box) in boxes.enumerated() {
             if let index = box.cards.firstIndex(where: { $0.id == card.id }) {
@@ -66,7 +66,7 @@ class LeitnerSystem {
     ///
     /// - Parameter limit: The maximum number of due cards to return. The default value is 10. If more cards are due, only the first `limit` number are returned.
     /// - Returns: An array of `Card` objects that are due for review, limited to the specified `limit`.
-    func dueForReview(limit: Int = 10) -> [Card] {
+    public func dueForReview(limit: Int = 10) -> [Card] {
         let today = Calendar.current.startOfDay(for: Date())
         var dueCards: [Card] = []
         
@@ -83,7 +83,7 @@ class LeitnerSystem {
     ///
     /// - Parameter boxes: An array of `Box` objects, each representing a box with its cards,
     ///   review interval, and last reviewed date.
-    func loadBoxes(boxes: [Box]) {
+    public func loadBoxes(boxes: [Box]) {
         self.boxes = boxes
     }
 

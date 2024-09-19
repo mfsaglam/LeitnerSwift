@@ -7,12 +7,22 @@
 
 import Foundation
 
-struct Box {
-    var cards: [Card]
-    var reviewInterval: TimeInterval
-    var lastReviewedDate: Date
+public struct Box {
+    public var cards: [Card]
+    public var reviewInterval: TimeInterval
+    public var lastReviewedDate: Date
     
-    var nextReviewDate: Date {
+    public init(
+        cards: [Card],
+        reviewInterval: TimeInterval,
+        lastReviewedDate: Date
+    ) {
+        self.cards = cards
+        self.reviewInterval = reviewInterval
+        self.lastReviewedDate = lastReviewedDate
+    }
+    
+    public var nextReviewDate: Date {
         return Calendar.current.date(byAdding: .day, value: Int(reviewInterval), to: lastReviewedDate) ?? Date()
     }
 }

@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct Card {
-    let id: UUID
-    let word: Word
+public struct Card {
+    public let id: UUID
+    public let word: Word
     
-    init(
+    public init(
         id: UUID = UUID(),
         word: Word
     ) {
