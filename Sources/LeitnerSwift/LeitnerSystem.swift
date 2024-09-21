@@ -25,7 +25,7 @@ public class LeitnerSystem {
             Box(
                 cards: [],
                 reviewInterval: TimeInterval(reviewIntervals[index]),
-                lastReviewedDate: Date()
+                lastReviewedDate: nil
             )
         }
     }

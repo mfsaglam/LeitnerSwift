@@ -39,6 +39,13 @@ class LeitnerFlowTest: XCTestCase {
         let sut21 = makeSUT(boxAmount: 21)
         XCTAssertEqual(sut21.boxes.count, 21)
     }
+    
+    func test_init_createsBoxesNotReviewed() {
+        let sut = makeSUT()
+        sut.boxes.forEach { box in
+            XCTAssertNil(box.lastReviewedDate, "System's boxes should not be reviewed when created.")
+        }
+    }
 
     func test_loadBoxes() {
         let sut = makeSUT(boxAmount: 3)
