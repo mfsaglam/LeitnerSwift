@@ -48,13 +48,22 @@ public class LeitnerSystem {
         // Find the card's current box
         for (boxIndex, box) in boxes.enumerated() {
             if let index = box.cards.firstIndex(where: { $0.id == card.id }) {
+                // Remove the card from the current box
                 boxes[boxIndex].cards.remove(at: index)
                 
                 if correct {
-                    let nextBox = min(boxIndex + 1, boxes.count - 1)
-                    appendCard(card, to: nextBox)
+                    // If the card is in the last box, remove it from the system
+                    if boxIndex == boxes.count - 1 {
+                        // Card has been correctly answered and is in the last box, so it is removed completely
+                        return
+                    } else {
+                        // Otherwise, move the card to the next box
+                        let nextBox = boxIndex + 1
+                        appendCard(card, to: nextBox)
+                    }
                 } else {
-                    appendCard(card, to: 0) // Move back to the first box
+                    // If the answer is incorrect, move the card back to the first box
+                    appendCard(card, to: 0)
                 }
                 break
             }

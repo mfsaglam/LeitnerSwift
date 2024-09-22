@@ -135,7 +135,7 @@ class LeitnerFlowTest: XCTestCase {
         XCTAssertEqual(sut.boxes[2].cards.first?.id, id, "The next(third) box should contain the card just moved.")
     }
     
-    func test_cardInLastBox_correctAnswer_keepsCardInLastBox() {
+    func test_cardInLastBox_correctAnswer_retiresTheCardFromSystem() {
         let sut = makeSUT()
         
         let id = fixedUuid
@@ -146,8 +146,7 @@ class LeitnerFlowTest: XCTestCase {
         
         sut.updateCard(card, correct: true)
         
-        XCTAssertEqual(sut.boxes[4].cards.count, 1, "The last box should still contain the card after a correct answer.")
-        XCTAssertEqual(sut.boxes[4].cards.first?.id, id, "The card should not move beyond the last box.")
+        XCTAssertEqual(sut.boxes[4].cards.count, 0, "The last box should remove the card from system after a correct answer.")
     }
     
     func test_cardInFirstBox_incorrectAnswer_keepsCardInFirstBox() {
