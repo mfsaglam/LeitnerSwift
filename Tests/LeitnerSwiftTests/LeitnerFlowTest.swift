@@ -191,6 +191,41 @@ class LeitnerFlowTest: XCTestCase {
         XCTAssertEqual(sut.boxes[4].cards.count, 0, "The last box should be empty after an incorrect answer.")
         XCTAssertEqual(sut.boxes[0].cards.first?.id, id, "The card should move back to the previous box after an incorrect answer.")
     }
+    
+    func test_lastReviewedDateUpdated_whenBoxIsFullyReviewed() {
+        let sut = makeSUT(boxAmount: 3) // 3 boxes for this test
+        let card1 = makeCard(with: UUID())
+        let card2 = makeCard(with: UUID())
+        
+        sut.addCard(card1)
+        sut.addCard(card2)
+        
+        // When: Both cards in the first box are answered correctly
+        sut.updateCard(card1, correct: true) // Moves to the next box
+        sut.updateCard(card2, correct: true) // Moves to the next box, now the box should be empty
+        
+        // Then: The first box should have its lastReviewedDate updated
+        let firstBox = sut.boxes[0]
+        XCTAssertEqual(firstBox.cards.isEmpty, true, "First box should be empty after all cards are moved.")
+        XCTAssertNotNil(firstBox.lastReviewedDate, "First box's lastReviewedDate should be updated after full review.")
+    }
+
+    func test_lastReviewedDateNotUpdated_whenBoxNotFullyReviewed() {
+        let sut = LeitnerSystem(boxAmount: 3)
+        let card1 = makeCard(with: UUID())
+        let card2 = makeCard(with: UUID())
+        
+        sut.addCard(card1)
+        sut.addCard(card2)
+        
+        // When: Only one card is answered correctly
+        sut.updateCard(card1, correct: true) // Moves to the next box
+        
+        // Then: The first box's lastReviewedDate should not be updated, as it still has one card left
+        let firstBox = sut.boxes[0]
+        XCTAssertEqual(firstBox.cards.count, 1, "First box should still have one card.")
+        XCTAssertNil(firstBox.lastReviewedDate, "First box's lastReviewedDate should not be updated while there are still cards to review.")
+    }
 
     func test_dueForReview_returnsDueCards() {
         let sut = makeSUT()

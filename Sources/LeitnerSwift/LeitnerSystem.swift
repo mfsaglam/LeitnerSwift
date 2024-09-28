@@ -65,8 +65,17 @@ public class LeitnerSystem {
                     // If the answer is incorrect, move the card back to the first box
                     appendCard(card, to: 0)
                 }
+                updateLastReviewedDateIfNeeded(for: boxIndex)
                 break
             }
+        }
+    }
+    
+    // Function to check and update the box's lastReviewedDate
+    private func updateLastReviewedDateIfNeeded(for boxIndex: Int) {
+        // If the box is empty, mark it as reviewed
+        if boxes[boxIndex].cards.isEmpty {
+            boxes[boxIndex].lastReviewedDate = Date() // Set the last reviewed date to now
         }
     }
     
