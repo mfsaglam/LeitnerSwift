@@ -39,13 +39,6 @@ class LeitnerFlowTest: XCTestCase {
         let sut21 = makeSUT(boxAmount: 21)
         XCTAssertEqual(sut21.boxes.count, 21)
     }
-    
-    func test_init_createsBoxesNotReviewed() {
-        let sut = makeSUT()
-        sut.boxes.forEach { box in
-            XCTAssertNil(box.lastReviewedDate, "System's boxes should not be reviewed when created.")
-        }
-    }
 
     func test_loadBoxes() {
         let sut = makeSUT(boxAmount: 3)
@@ -70,7 +63,7 @@ class LeitnerFlowTest: XCTestCase {
     func test_reviewIntervals_withDefaultBoxes() {
         let sut = makeSUT()
         
-        let expectedIntervals: [TimeInterval] = [1, 3, 7, 14, 30]
+        let expectedIntervals: [TimeInterval] = [0, 3, 7, 14, 30]
         for (index, box) in sut.boxes.enumerated() {
             XCTAssertEqual(box.reviewInterval, expectedIntervals[index], "The review interval for box \(index + 1) should be \(expectedIntervals[index]).")
         }
@@ -79,7 +72,7 @@ class LeitnerFlowTest: XCTestCase {
     func test_reviewIntervals_withMoreBoxes() {
         let sut = makeSUT(boxAmount: 7)
         
-        let expectedIntervals: [TimeInterval] = [1, 3, 7, 14, 30, 60, 120]
+        let expectedIntervals: [TimeInterval] = [0, 3, 7, 14, 30, 60, 120]
         for (index, box) in sut.boxes.enumerated() {
             XCTAssertEqual(box.reviewInterval, expectedIntervals[index], "The review interval for box \(index + 1) should be \(expectedIntervals[index]).")
         }
@@ -88,7 +81,7 @@ class LeitnerFlowTest: XCTestCase {
     func test_reviewIntervals_withLessThanTwoBoxes_usesTwoReviewIntervals() {
         let sut = makeSUT(boxAmount: 1)
         
-        let expectedIntervals: [TimeInterval] = [1, 3]  // Only two intervals since there are two boxes
+        let expectedIntervals: [TimeInterval] = [0, 3]  // Only two intervals since there are two boxes
         for (index, box) in sut.boxes.enumerated() {
             XCTAssertEqual(box.reviewInterval, expectedIntervals[index], "The review interval for box \(index + 1) should be \(expectedIntervals[index]).")
         }
@@ -229,13 +222,17 @@ class LeitnerFlowTest: XCTestCase {
         sut.addCard(card1)
         sut.addCard(card2)
         
+        // move cards to second box manually
+        try sut.updateCard(card1, correct: true)
+        try sut.updateCard(card2, correct: true)
+
         // When: Only one card is answered correctly
         try sut.updateCard(card1, correct: true) // Moves to the next box
         
-        // Then: The first box's lastReviewedDate should not be updated, as it still has one card left
-        let firstBox = sut.boxes[0]
-        XCTAssertEqual(firstBox.cards.count, 1, "First box should still have one card.")
-        XCTAssertNil(firstBox.lastReviewedDate, "First box's lastReviewedDate should not be updated while there are still cards to review.")
+        // Then: The second box's lastReviewedDate should not be updated, as it still has one card left
+        let firstBox = sut.boxes[1]
+        XCTAssertEqual(firstBox.cards.count, 1, "Second box should still have one card.")
+        XCTAssertNil(firstBox.lastReviewedDate, "Second box's lastReviewedDate should not be updated while there are still cards to review.")
     }
     
     func test_dueForReview_throwsErrorWhenNoCardForReview() {

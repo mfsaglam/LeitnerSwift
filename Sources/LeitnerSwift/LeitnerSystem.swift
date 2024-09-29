@@ -22,10 +22,11 @@ public class LeitnerSystem {
         let reviewIntervals = LeitnerSystem.generateReviewIntervals(for: boxCount)
         
         boxes = (0..<boxCount).map { index in
-            Box(
+            let initialLastReviewedDate: Date? = index == 0 ? Date() : nil
+            return Box(
                 cards: [],
                 reviewInterval: TimeInterval(reviewIntervals[index]),
-                lastReviewedDate: nil
+                lastReviewedDate: initialLastReviewedDate
             )
         }
     }
@@ -120,7 +121,7 @@ public class LeitnerSystem {
 
     // Generates review intervals based on the number of boxes
     static private func generateReviewIntervals(for boxCount: Int) -> [Int] {
-        let baseIntervals = [1, 3, 7, 14, 30, 60]
+        let baseIntervals = [0, 3, 7, 14, 30, 60]
         var intervals = [Int]()
         
         for i in 0..<boxCount {
