@@ -249,6 +249,29 @@ class LeitnerFlowTest: XCTestCase {
         XCTAssertEqual(result.first?.id, card1.id, "Expected the first card to be due for review.")
     }
     
+    func test_dueForReview_returnsHigherLevelBoxFirst() {
+        let sut = makeSUT(boxAmount: 3) // 3 boxes for this test
+        
+        let pastDate = Calendar.current.date(byAdding: .day, value: -2, to: Date())! // 2 days in the past
+        
+        let card1 = makeCard(with: UUID())
+        let card2 = makeCard(with: UUID())
+        let card3 = makeCard(with: UUID())
+        
+        // insert each card into each boxes (due for review)
+        sut.loadBoxes(boxes: [
+            makeBox(cards: [card1], lastReviewedDate: pastDate),
+            makeBox(cards: [card2], lastReviewedDate: pastDate),
+            makeBox(cards: [card3], lastReviewedDate: pastDate)
+        ])
+        
+        let result = sut.dueForReview(limit: 3)
+        
+        XCTAssertEqual(result[0].id, card3.id, "Expected the first card to be the one in the third box.")
+        XCTAssertEqual(result[1].id, card2.id, "Expected the second card to be the one in the second box.")
+        XCTAssertEqual(result[2].id, card1.id, "Expected the last one card to be the one in the first box.")
+    }
+    
     func test_dueForReview_returnsNewlyAddedCards() {
         let sut = makeSUT()
 

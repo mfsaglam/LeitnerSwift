@@ -88,7 +88,7 @@ public class LeitnerSystem {
         let today = Calendar.current.startOfDay(for: Date())
         var dueCards: [Card] = []
         
-        for box in boxes where Calendar.current.startOfDay(for: box.nextReviewDate) <= today {
+        for box in boxes.reversed() where Calendar.current.startOfDay(for: box.nextReviewDate) <= today {
             dueCards.append(contentsOf: box.cards)
         }
         
