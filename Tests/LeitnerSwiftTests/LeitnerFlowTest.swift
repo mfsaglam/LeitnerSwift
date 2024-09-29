@@ -322,6 +322,59 @@ class LeitnerFlowTest: XCTestCase {
         
         XCTAssertEqual(result.count, 2, "Expected to fetch only 2 cards due for review, got \(result.count)")
     }
+    
+    func test_cardCountsPerBox_withEmptyBoxes() {
+        let sut = LeitnerSystem(boxAmount: 5)  // System with 5 boxes
+
+        let expectedCounts = [0, 0, 0, 0, 0]
+        XCTAssertEqual(sut.cardCountsPerBox, expectedCounts, "Expected all boxes to be empty when initialized.")
+    }
+    
+    func test_cardCountsPerBox_withCardsAdded() throws {
+        var sut = LeitnerSystem(boxAmount: 5)
+        
+        // Add cards to various boxes
+        let card1 = makeCard(with: UUID())
+        let card2 = makeCard(with: UUID())
+        let card3 = makeCard(with: UUID())
+        
+        sut.addCard(card1)  // Adds card to the first box
+        try sut.updateCard(card1, correct: true)  // Moves card1 to the second box
+        sut.addCard(card2)  // Adds card to the first box
+        sut.addCard(card3)  // Adds card to the first box
+        
+        let expectedCounts = [2, 1, 0, 0, 0]
+        XCTAssertEqual(sut.cardCountsPerBox, expectedCounts, "Expected counts to reflect the number of cards added and moved.")
+    }
+    
+    func test_cardCountsPerBox_afterCardMovesToLastBox() throws {
+        var sut = LeitnerSystem(boxAmount: 5)
+        
+        let card = makeCard(with: UUID())
+        sut.addCard(card)
+        
+        // Simulate correct answers moving the card to the last box
+        try moveCardForward(card: card, to: 4, in: sut)
+        
+        let expectedCounts = [0, 0, 0, 0, 1]  // Only the last box should have the card
+        XCTAssertEqual(sut.cardCountsPerBox, expectedCounts, "Expected card to move to the last box after correct answers.")
+    }
+    
+    func test_cardCountsPerBox_afterIncorrectAnswers() throws {
+        var sut = LeitnerSystem(boxAmount: 5)
+        
+        let card = makeCard(with: UUID())
+        sut.addCard(card)
+        
+        // Move the card to the second box
+        try sut.updateCard(card, correct: true)
+        
+        // Now, simulate an incorrect answer
+        try sut.updateCard(card, correct: false)
+        
+        let expectedCounts = [1, 0, 0, 0, 0]  // Card should be back in the first box
+        XCTAssertEqual(sut.cardCountsPerBox, expectedCounts, "Expected card to return to the first box after incorrect answer.")
+    }
 
      // MARK: - Test Helpers
     

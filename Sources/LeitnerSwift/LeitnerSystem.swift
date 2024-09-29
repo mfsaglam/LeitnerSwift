@@ -113,6 +113,10 @@ public class LeitnerSystem {
     public func loadBoxes(boxes: [Box]) {
         self.boxes = boxes
     }
+    
+    public var cardCountsPerBox: [Int] {
+        return boxes.map { $0.cards.count }
+    }
 
     // Generates review intervals based on the number of boxes
     static private func generateReviewIntervals(for boxCount: Int) -> [Int] {
