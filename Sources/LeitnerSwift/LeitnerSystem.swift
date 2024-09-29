@@ -22,7 +22,7 @@ public class LeitnerSystem {
         let reviewIntervals = LeitnerSystem.generateReviewIntervals(for: boxCount)
         
         boxes = (0..<boxCount).map { index in
-            let initialLastReviewedDate: Date? = index == 0 ? Date() : nil
+            let initialLastReviewedDate: Date? = Date()
             return Box(
                 cards: [],
                 reviewInterval: TimeInterval(reviewIntervals[index]),

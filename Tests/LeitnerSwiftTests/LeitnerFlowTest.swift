@@ -216,6 +216,7 @@ class LeitnerFlowTest: XCTestCase {
 
     func test_lastReviewedDateNotUpdated_whenBoxNotFullyReviewed() throws {
         let sut = LeitnerSystem(boxAmount: 3)
+        let expectedDate = sut.boxes[1].lastReviewedDate
         let card1 = makeCard(with: UUID())
         let card2 = makeCard(with: UUID())
         
@@ -232,7 +233,7 @@ class LeitnerFlowTest: XCTestCase {
         // Then: The second box's lastReviewedDate should not be updated, as it still has one card left
         let firstBox = sut.boxes[1]
         XCTAssertEqual(firstBox.cards.count, 1, "Second box should still have one card.")
-        XCTAssertNil(firstBox.lastReviewedDate, "Second box's lastReviewedDate should not be updated while there are still cards to review.")
+        XCTAssertEqual(firstBox.lastReviewedDate, expectedDate, "Second box's lastReviewedDate should not be updated while there are still cards to review.")
     }
     
     func test_dueForReview_throwsErrorWhenNoCardForReview() {
