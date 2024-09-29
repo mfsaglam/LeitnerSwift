@@ -31,7 +31,7 @@ Alternatively, you can add it to your `Package.swift` file:
 
 ```swift
 dependencies: [
- .package(url: "https://github.com/mfsaglam/LeitnerSwift.git", from: "1.0.0")
+ .package(url: "https://github.com/mfsaglam/LeitnerSwift.git", from: "1.3.7")
 ]
 ```
 
@@ -58,13 +58,13 @@ leitnerSystem.addCard(card)
 After a review session, you can update the card's progress. If the user answers correctly, the card will move to the next box. If not, the card will return to the first box.
 
 ```swift
-leitnerSystem.updateCard(card, correct: true)
+try leitnerSystem.updateCard(card, correct: true)
 ```
 ### Reviewing Due Cards
 You can fetch cards that are due for review. The method returns cards whose next review date is today or earlier.
 
 ```swift
-let dueCards = leitnerSystem.dueForReview(limit: 10)
+let dueCards = try leitnerSystem.dueForReview(limit: 10)
 ```
 
 
