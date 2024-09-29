@@ -105,20 +105,30 @@ class LeitnerFlowTest: XCTestCase {
         XCTAssertEqual(sut.boxes[0].cards.first?.id, id, "The first box should contain the card after it's added.")
     }
     
-    func test_cardInFirstBox_correctAnswer_movesCardToSecondBox() {
+    func test_updateCard_throwsErrorWhenCardNotFound() {
+        let system = LeitnerSystem(boxAmount: 3)
+        let card = makeCard(with: UUID())
+        
+        // When: We try to update a card that hasn't been added to the system
+        XCTAssertThrowsError(try system.updateCard(card, correct: true)) { error in
+            XCTAssertEqual(error as? LeitnerError, LeitnerError.cardNotFound)
+        }
+    }
+    
+    func test_cardInFirstBox_correctAnswer_movesCardToSecondBox() throws {
         let sut = makeSUT()
         
         let id = fixedUuid
         let card = makeCard(with: id)
         sut.addCard(card)
         
-        sut.updateCard(card, correct: true)
+        try sut.updateCard(card, correct: true)
         
         XCTAssertEqual(sut.boxes[0].cards.count, 0, "The first box should be empty.")
         XCTAssertEqual(sut.boxes[1].cards.first?.id, id, "The second box should contain the card just moved.")
     }
     
-    func test_cardInSecondBox_correctAnswer_movesCardToThirdBox() {
+    func test_cardInSecondBox_correctAnswer_movesCardToThirdBox() throws {
         let sut = makeSUT()
         
         let id = fixedUuid
@@ -126,73 +136,74 @@ class LeitnerFlowTest: XCTestCase {
         sut.addCard(card)
         
         // Move the card to the second box manually
-        moveCardForward(card: card, to: 1, in: sut)
+        try sut.updateCard(card, correct: true)
+//        moveCardForward(card: card, to: 1, in: sut)
 
-        sut.updateCard(card, correct: true)
+        try sut.updateCard(card, correct: true)
         
         XCTAssertEqual(sut.boxes[0].cards.count, 0, "The first box should be empty.")
         XCTAssertEqual(sut.boxes[1].cards.count, 0, "The second box should be empty.")
         XCTAssertEqual(sut.boxes[2].cards.first?.id, id, "The next(third) box should contain the card just moved.")
     }
     
-    func test_cardInLastBox_correctAnswer_retiresTheCardFromSystem() {
+    func test_cardInLastBox_correctAnswer_retiresTheCardFromSystem() throws {
         let sut = makeSUT()
         
         let id = fixedUuid
         let card = makeCard(with: id)
         sut.addCard(card)
         // Move the card to the last box manually
-        moveCardForward(card: card, to: 4, in: sut)
+        try moveCardForward(card: card, to: 4, in: sut)
         
-        sut.updateCard(card, correct: true)
+        try sut.updateCard(card, correct: true)
         
         XCTAssertEqual(sut.boxes[4].cards.count, 0, "The last box should remove the card from system after a correct answer.")
     }
     
-    func test_cardInFirstBox_incorrectAnswer_keepsCardInFirstBox() {
+    func test_cardInFirstBox_incorrectAnswer_keepsCardInFirstBox() throws {
         let sut = makeSUT()
         
         let id = fixedUuid
         let card = makeCard(with: id)
         sut.addCard(card)
         
-        sut.updateCard(card, correct: false)
+        try sut.updateCard(card, correct: false)
         
         XCTAssertEqual(sut.boxes[0].cards.count, 1, "The first box should still contain the card after an incorrect answer.")
         XCTAssertEqual(sut.boxes[0].cards.first?.id, id, "The card should not move after an incorrect answer in the first box.")
     }
     
-    func test_cardInSecondBox_incorrectAnswer_movesCardBackToFirstBox() {
+    func test_cardInSecondBox_incorrectAnswer_movesCardBackToFirstBox() throws {
         let sut = makeSUT()
 
         let id = fixedUuid
         let card = makeCard(with: id)
         sut.addCard(card)
         // Move the card to the second box manually
-        moveCardForward(card: card, to: 1, in: sut)
+        try moveCardForward(card: card, to: 1, in: sut)
         
-        sut.updateCard(card, correct: false)
+        try sut.updateCard(card, correct: false)
         
         XCTAssertEqual(sut.boxes[1].cards.count, 0, "The second box should be empty after an incorrect answer.")
         XCTAssertEqual(sut.boxes[0].cards.first?.id, id, "The card should move back to the first box after an incorrect answer.")
     }
     
-    func test_cardInLastBox_incorrectAnswer_movesCardToFirstBox() {
+    func test_cardInLastBox_incorrectAnswer_movesCardToFirstBox() throws {
         let sut = makeSUT()
 
         let id = fixedUuid
         let card = makeCard(with: id)
         sut.addCard(card)
         // Move the card to the last box manually
-        moveCardForward(card: card, to: 4, in: sut)
+        try moveCardForward(card: card, to: 4, in: sut)
         
-        sut.updateCard(card, correct: false)
+        try sut.updateCard(card, correct: false)
         
         XCTAssertEqual(sut.boxes[4].cards.count, 0, "The last box should be empty after an incorrect answer.")
         XCTAssertEqual(sut.boxes[0].cards.first?.id, id, "The card should move back to the previous box after an incorrect answer.")
     }
     
-    func test_lastReviewedDateUpdated_whenBoxIsFullyReviewed() {
+    func test_lastReviewedDateUpdated_whenBoxIsFullyReviewed() throws {
         let sut = makeSUT(boxAmount: 3) // 3 boxes for this test
         let card1 = makeCard(with: UUID())
         let card2 = makeCard(with: UUID())
@@ -201,8 +212,8 @@ class LeitnerFlowTest: XCTestCase {
         sut.addCard(card2)
         
         // When: Both cards in the first box are answered correctly
-        sut.updateCard(card1, correct: true) // Moves to the next box
-        sut.updateCard(card2, correct: true) // Moves to the next box, now the box should be empty
+        try sut.updateCard(card1, correct: true) // Moves to the next box
+        try sut.updateCard(card2, correct: true) // Moves to the next box, now the box should be empty
         
         // Then: The first box should have its lastReviewedDate updated
         let firstBox = sut.boxes[0]
@@ -210,7 +221,7 @@ class LeitnerFlowTest: XCTestCase {
         XCTAssertNotNil(firstBox.lastReviewedDate, "First box's lastReviewedDate should be updated after full review.")
     }
 
-    func test_lastReviewedDateNotUpdated_whenBoxNotFullyReviewed() {
+    func test_lastReviewedDateNotUpdated_whenBoxNotFullyReviewed() throws {
         let sut = LeitnerSystem(boxAmount: 3)
         let card1 = makeCard(with: UUID())
         let card2 = makeCard(with: UUID())
@@ -219,15 +230,22 @@ class LeitnerFlowTest: XCTestCase {
         sut.addCard(card2)
         
         // When: Only one card is answered correctly
-        sut.updateCard(card1, correct: true) // Moves to the next box
+        try sut.updateCard(card1, correct: true) // Moves to the next box
         
         // Then: The first box's lastReviewedDate should not be updated, as it still has one card left
         let firstBox = sut.boxes[0]
         XCTAssertEqual(firstBox.cards.count, 1, "First box should still have one card.")
         XCTAssertNil(firstBox.lastReviewedDate, "First box's lastReviewedDate should not be updated while there are still cards to review.")
     }
+    
+    func test_dueForReview_throwsErrorWhenNoCardForReview() {
+        let sut = makeSUT()
+        
+        // No card for review, throws error
+        XCTAssertThrowsError(try sut.dueForReview())
+    }
 
-    func test_dueForReview_returnsDueCards() {
+    func test_dueForReview_returnsDueCards() throws {
         let sut = makeSUT()
         
         let pastDate = Calendar.current.date(byAdding: .day, value: -2, to: Date())! // 2 days in the past
@@ -243,13 +261,13 @@ class LeitnerFlowTest: XCTestCase {
             ]
         )
         
-        let result = sut.dueForReview(limit: 1)
+        let result = try sut.dueForReview(limit: 1)
         
         XCTAssertEqual(result.count, 1, "Expected 1 card due for review, got \(result.count)")
         XCTAssertEqual(result.first?.id, card1.id, "Expected the first card to be due for review.")
     }
     
-    func test_dueForReview_returnsHigherLevelBoxFirst() {
+    func test_dueForReview_returnsHigherLevelBoxFirst() throws {
         let sut = makeSUT(boxAmount: 3) // 3 boxes for this test
         
         let pastDate = Calendar.current.date(byAdding: .day, value: -2, to: Date())! // 2 days in the past
@@ -265,26 +283,26 @@ class LeitnerFlowTest: XCTestCase {
             makeBox(cards: [card3], lastReviewedDate: pastDate)
         ])
         
-        let result = sut.dueForReview(limit: 3)
+        let result = try sut.dueForReview(limit: 3)
         
         XCTAssertEqual(result[0].id, card3.id, "Expected the first card to be the one in the third box.")
         XCTAssertEqual(result[1].id, card2.id, "Expected the second card to be the one in the second box.")
         XCTAssertEqual(result[2].id, card1.id, "Expected the last one card to be the one in the first box.")
     }
     
-    func test_dueForReview_returnsNewlyAddedCards() {
+    func test_dueForReview_returnsNewlyAddedCards() throws {
         let sut = makeSUT()
 
         let card1 = makeCard(with: UUID())
         sut.addCard(card1)
         
-        let result = sut.dueForReview()
+        let result = try sut.dueForReview()
         
         XCTAssertEqual(result.count, 1, "Expected 1 card due for review, got \(result.count)")
         XCTAssertEqual(result.first?.id, card1.id, "Expected the first card to be due for review.")
     }
     
-    func test_dueForReview_limitsReturnedCards() {
+    func test_dueForReview_limitsReturnedCards() throws {
         let sut = makeSUT()
         
         let pastDate = Calendar.current.date(byAdding: .day, value: -2, to: Date())! // 2 days in the past
@@ -300,30 +318,9 @@ class LeitnerFlowTest: XCTestCase {
             ]
         )
         
-        let result = sut.dueForReview(limit: 2)
+        let result = try sut.dueForReview(limit: 2)
         
         XCTAssertEqual(result.count, 2, "Expected to fetch only 2 cards due for review, got \(result.count)")
-    }
-    
-    func test_dueForReview_noDueCards_returnsEmpty() {
-        let sut = makeSUT()
-        
-        let pastDate = Calendar.current.date(byAdding: .day, value: -1, to: Date())! // 1 day in the past
-        
-        // Create 3 cards
-        let card1 = makeCard(with: UUID())
-        let card2 = makeCard(with: UUID())
-        let card3 = makeCard(with: UUID())
-        
-        sut.loadBoxes(
-            boxes: [
-                makeBox(cards: [card1, card2, card3], reviewInterval: 2, lastReviewedDate: pastDate), // Not due for review
-            ]
-        )
-        
-        let result = sut.dueForReview()
-        
-        XCTAssertTrue(result.isEmpty, "Expected to fetch none, got \(result.count)")
     }
 
      // MARK: - Test Helpers
@@ -332,9 +329,9 @@ class LeitnerFlowTest: XCTestCase {
         return boxAmount != nil ? LeitnerSystem(boxAmount: boxAmount!) : LeitnerSystem()
     }
     
-    private func moveCardForward(card: Card, to boxIndex: Int, in sut: LeitnerSystem) {
+    private func moveCardForward(card: Card, to boxIndex: Int, in sut: LeitnerSystem) throws {
         for _ in 0..<boxIndex {
-            sut.updateCard(card, correct: true)
+            try sut.updateCard(card, correct: true)
         }
     }
     
@@ -373,5 +370,18 @@ class LeitnerFlowTest: XCTestCase {
 
     private var fixedDate: Date {
         return Date(timeIntervalSince1970: 0)  // Fixed date for testing
+    }
+}
+
+extension LeitnerError: Equatable {
+    public static func == (lhs: LeitnerError, rhs: LeitnerError) -> Bool {
+        switch (lhs, rhs) {
+        case (.cardNotFound, .cardNotFound):
+            return true
+        case (.reviewProcessError(let lhsReason), .reviewProcessError(let rhsReason)):
+            return lhsReason == rhsReason
+        default:
+            return false
+        }
     }
 }

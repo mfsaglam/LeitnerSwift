@@ -44,12 +44,14 @@ public class LeitnerSystem {
     /// - Parameters:
     ///   - card: The `Card` object to be updated. This is passed as an inout parameter to allow modification.
     ///   - correct: A Boolean indicating whether the user's answer was correct. If `true`, the card progresses to the next box; if `false`, it returns to the first box.
-    public func updateCard(_ card: Card, correct: Bool) {
+    public func updateCard(_ card: Card, correct: Bool) throws {
         // Find the card's current box
+        var cardFound = false
         for (boxIndex, box) in boxes.enumerated() {
             if let index = box.cards.firstIndex(where: { $0.id == card.id }) {
                 // Remove the card from the current box
                 boxes[boxIndex].cards.remove(at: index)
+                cardFound = true
                 
                 if correct {
                     // If the card is in the last box, remove it from the system
@@ -69,6 +71,9 @@ public class LeitnerSystem {
                 break
             }
         }
+        if !cardFound {
+            throw LeitnerError.cardNotFound
+        }
     }
     
     // Function to check and update the box's lastReviewedDate
@@ -84,12 +89,16 @@ public class LeitnerSystem {
     ///
     /// - Parameter limit: The maximum number of due cards to return. The default value is 10. If more cards are due, only the first `limit` number are returned.
     /// - Returns: An array of `Card` objects that are due for review, limited to the specified `limit`.
-    public func dueForReview(limit: Int = 10) -> [Card] {
+    public func dueForReview(limit: Int = 10) throws -> [Card] {
         let today = Calendar.current.startOfDay(for: Date())
         var dueCards: [Card] = []
         
         for box in boxes.reversed() where Calendar.current.startOfDay(for: box.nextReviewDate) <= today {
             dueCards.append(contentsOf: box.cards)
+        }
+        
+        if dueCards.isEmpty {
+            throw LeitnerError.reviewProcessError(reason: "No cards are due for review.")
         }
         
         return Array(dueCards.prefix(limit))
