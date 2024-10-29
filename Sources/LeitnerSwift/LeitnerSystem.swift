@@ -30,6 +30,16 @@ public class LeitnerSystem {
             )
         }
     }
+
+    /// A read-only property that provides access to the array of `Box` objects in the system.
+    ///
+    /// `allBoxes` allows external clients to retrieve the current state of all boxes in the
+    /// Leitner system, which can be used to save or display progress. This property provides
+    /// a copy of the internal `boxes` array, ensuring that clients can access the current
+    /// state without the ability to modify the underlying data, preserving the system's integrity.
+    public var allBoxes: [Box] {
+        return boxes
+    }
     
     /// Adds a new card to the Leitner system, placing it in the first box.
     /// The card will always start in the first box, and its progress will be tracked from there.
