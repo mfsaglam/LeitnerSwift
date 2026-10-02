@@ -140,6 +140,31 @@ public class LeitnerSystem {
         return boxes.map { $0.cards.count }
     }
 
+    /// Counts the cards that are due for review as of a given date, using the same
+    /// box-level logic as `dueForReview`.
+    ///
+    /// - Parameter date: The date to evaluate "due" against.
+    /// - Returns: The total number of cards in boxes whose `nextReviewDate` is on or before `date`.
+    public func dueCount(asOf date: Date) -> Int {
+        let today = Calendar.current.startOfDay(for: date)
+        return boxes.reduce(0) { result, box in
+            guard !box.cards.isEmpty else { return result }
+            return Calendar.current.startOfDay(for: box.nextReviewDate) <= today ? result + box.cards.count : result
+        }
+    }
+
+    /// The number of cards due for review as of now (via `dateProvider`).
+    public var dueCount: Int {
+        dueCount(asOf: dateProvider())
+    }
+
+    /// The earliest `nextReviewDate` among boxes that still contain cards.
+    /// `nil` whenever `dueCount` is greater than zero, since there is nothing to wait for.
+    public var nextDueDate: Date? {
+        guard dueCount == 0 else { return nil }
+        return boxes.filter { !$0.cards.isEmpty }.map(\.nextReviewDate).min()
+    }
+
     // Generates review intervals based on the number of boxes
     static private func generateReviewIntervals(for boxCount: Int) -> [Int] {
         let baseIntervals = [0, 3, 7, 14, 30, 60]
