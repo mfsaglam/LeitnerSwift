@@ -18,7 +18,7 @@ yalnızca bu tablo güncellenir.
 
 | # | Adım | Model | Branch | Repo | Durum |
 |---|---|---|---|---|---|
-| 1 | Karakterizasyon testleri | Opus 5 | `test/characterization` | LeitnerSwift | 🟡 IN PROGRESS |
+| 1 | Karakterizasyon testleri | Opus 5 | `test/characterization` | LeitnerSwift | ✅ DONE |
 | 2 | Crash ve mantık hataları | Sonnet 5 | `fix/crashes-and-logic` | LeitnerSwift | ⬜ TODO |
 | 3 | `LeitnerError`'ı public yap | Haiku 4.5 | `fix/public-error-type` | LeitnerSwift | ⬜ TODO |
 | — | **tag `1.3.9`** | — | — | LeitnerSwift | ⬜ TODO |
