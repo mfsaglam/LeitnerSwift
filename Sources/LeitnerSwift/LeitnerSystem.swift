@@ -46,6 +46,8 @@ public class LeitnerSystem {
     ///
     /// - Parameter card: The `Card` object to be added to the first box for review.
     public func addCard(_ card: Card) {
+        guard !boxes.isEmpty else { return }
+        guard !boxes.contains(where: { $0.cards.contains(where: { $0.id == card.id }) }) else { return }
         boxes[0].cards.append(card)  // Start card in the first box
     }
     
@@ -56,6 +58,9 @@ public class LeitnerSystem {
     ///   - card: The `Card` object to be updated. This is passed as an inout parameter to allow modification.
     ///   - correct: A Boolean indicating whether the user's answer was correct. If `true`, the card progresses to the next box; if `false`, it returns to the first box.
     public func updateCard(_ card: Card, correct: Bool) throws {
+        guard !boxes.isEmpty else {
+            throw LeitnerError.cardNotFound
+        }
         // Find the card's current box
         var cardFound = false
         for (boxIndex, box) in boxes.enumerated() {
@@ -68,6 +73,7 @@ public class LeitnerSystem {
                     // If the card is in the last box, remove it from the system
                     if boxIndex == boxes.count - 1 {
                         // Card has been correctly answered and is in the last box, so it is removed completely
+                        updateLastReviewedDateIfNeeded(for: boxIndex)
                         return
                     } else {
                         // Otherwise, move the card to the next box
@@ -112,7 +118,7 @@ public class LeitnerSystem {
             throw LeitnerError.reviewProcessError(reason: "No cards are due for review.")
         }
         
-        return Array(dueCards.prefix(limit))
+        return Array(dueCards.prefix(max(0, limit)))
     }
     
     /// Loads an existing set of boxes into the Leitner system.
@@ -139,7 +145,7 @@ public class LeitnerSystem {
                 intervals.append(baseIntervals[i])
             } else {
                 // Extend the intervals for more boxes (e.g., double the last one or add a custom logic)
-                let extendedInterval = intervals.last! * 2  // Example: extend by doubling the last interval
+                let extendedInterval = min(intervals.last! * 2, 365)  // Example: extend by doubling the last interval, capped to avoid overflow
                 intervals.append(extendedInterval)
             }
         }

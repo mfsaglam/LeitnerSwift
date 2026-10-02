@@ -19,7 +19,7 @@ yalnızca bu tablo güncellenir.
 | # | Adım | Model | Branch | Repo | Durum |
 |---|---|---|---|---|---|
 | 1 | Karakterizasyon testleri | Opus 5 | `test/characterization` | LeitnerSwift | ✅ DONE |
-| 2 | Crash ve mantık hataları | Sonnet 5 | `fix/crashes-and-logic` | LeitnerSwift | 🟡 IN PROGRESS |
+| 2 | Crash ve mantık hataları | Sonnet 5 | `fix/crashes-and-logic` | LeitnerSwift | ✅ DONE |
 | 3 | `LeitnerError`'ı public yap | Haiku 4.5 | `fix/public-error-type` | LeitnerSwift | ⬜ TODO |
 | — | **tag `1.3.9`** | — | — | LeitnerSwift | ⬜ TODO |
 | 4 | Zaman enjeksiyonu | Sonnet 5 | `feat/date-provider` | LeitnerSwift | ⬜ TODO |
