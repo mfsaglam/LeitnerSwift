@@ -24,9 +24,9 @@ yalnızca bu tablo güncellenir.
 | — | **tag `1.3.9`** | — | — | LeitnerSwift | ✅ DONE |
 | 4 | Zaman enjeksiyonu | Sonnet 5 | `feat/date-provider` | LeitnerSwift | ✅ DONE |
 | 5 | Due API'sini taşı | Sonnet 5 | `feat/due-query-api` | LeitnerSwift | ✅ DONE |
-| — | **tag `1.4.0`** | — | — | LeitnerSwift | ⬜ TODO |
+| — | **tag `1.4.0`** | — | — | LeitnerSwift | ✅ DONE |
 | 6 | Uygulama yeni API'ye geçsin | Sonnet 5 | `refactor/use-library-due-api` | ⚠️ wordlern | ✅ DONE |
-| 7 | B1: zamanlamayı karta taşı | Opus 5 | `fix/card-level-scheduling` | LeitnerSwift | ⬜ TODO |
+| 7 | B1: zamanlamayı karta taşı | Opus 5 | `fix/card-level-scheduling` | LeitnerSwift | 🟡 IN PROGRESS |
 | — | **tag `1.5.0`** | — | — | LeitnerSwift | ⬜ TODO |
 | 8 | Uygulama kart tarihini saklasın | Sonnet 5 | `feat/persist-card-review-date` | ⚠️ wordlern | ⬜ TODO |
 
