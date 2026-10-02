@@ -70,10 +70,14 @@ public class LeitnerSystem {
         var cardFound = false
         for (boxIndex, box) in boxes.enumerated() {
             if let index = box.cards.firstIndex(where: { $0.id == card.id }) {
-                // Remove the card from the current box
+                // Remove the card from the current box, stamping it as reviewed now.
+                // The stamp is what schedules the card in its next box, so it is
+                // applied no matter which way the card moves.
+                var reviewedCard = boxes[boxIndex].cards[index]
+                reviewedCard.lastReviewedDate = dateProvider()
                 boxes[boxIndex].cards.remove(at: index)
                 cardFound = true
-                
+
                 if correct {
                     // If the card is in the last box, remove it from the system
                     if boxIndex == boxes.count - 1 {
@@ -83,11 +87,11 @@ public class LeitnerSystem {
                     } else {
                         // Otherwise, move the card to the next box
                         let nextBox = boxIndex + 1
-                        appendCard(card, to: nextBox)
+                        appendCard(reviewedCard, to: nextBox)
                     }
                 } else {
                     // If the answer is incorrect, move the card back to the first box
-                    appendCard(card, to: 0)
+                    appendCard(reviewedCard, to: 0)
                 }
                 updateLastReviewedDateIfNeeded(for: boxIndex)
                 break
@@ -114,11 +118,11 @@ public class LeitnerSystem {
     public func dueForReview(limit: Int = 10) throws -> [Card] {
         let today = Calendar.current.startOfDay(for: dateProvider())
         var dueCards: [Card] = []
-        
-        for box in boxes.reversed() where Calendar.current.startOfDay(for: box.nextReviewDate) <= today {
-            dueCards.append(contentsOf: box.cards)
+
+        for box in boxes.reversed() {
+            dueCards.append(contentsOf: box.cards.filter { isDue($0, in: box, asOf: today) })
         }
-        
+
         if dueCards.isEmpty {
             throw LeitnerError.reviewProcessError(reason: "No cards are due for review.")
         }
@@ -130,26 +134,52 @@ public class LeitnerSystem {
     /// This method replaces the current boxes with the provided ones.
     /// Typically used when reloading a previously saved state of the Leitner system from storage.
     ///
+    /// Cards that carry no `lastReviewedDate` inherit the one of the box they are
+    /// loaded into. Storage that predates card-level scheduling therefore keeps
+    /// behaving exactly as it did when scheduling was box-level.
+    ///
     /// - Parameter boxes: An array of `Box` objects, each representing a box with its cards,
     ///   review interval, and last reviewed date.
     public func loadBoxes(boxes: [Box]) {
-        self.boxes = boxes
+        self.boxes = boxes.map { box in
+            guard box.cards.contains(where: { $0.lastReviewedDate == nil }) else { return box }
+            var stampedBox = box
+            stampedBox.cards = box.cards.map { card in
+                guard card.lastReviewedDate == nil else { return card }
+                var stampedCard = card
+                stampedCard.lastReviewedDate = box.lastReviewedDate
+                return stampedCard
+            }
+            return stampedBox
+        }
     }
-    
+
+    /// The date a card becomes due again: its own last review stamp pushed forward
+    /// by the review interval of the box it currently sits in.
+    /// `nil` means the card has never been reviewed, so it is due immediately.
+    private func nextReviewDate(of card: Card, in box: Box) -> Date? {
+        guard let lastReviewedDate = card.lastReviewedDate else { return nil }
+        return Calendar.current.date(byAdding: .day, value: Int(box.reviewInterval), to: lastReviewedDate)
+    }
+
+    private func isDue(_ card: Card, in box: Box, asOf startOfToday: Date) -> Bool {
+        guard let nextReviewDate = nextReviewDate(of: card, in: box) else { return true }
+        return Calendar.current.startOfDay(for: nextReviewDate) <= startOfToday
+    }
+
     public var cardCountsPerBox: [Int] {
         return boxes.map { $0.cards.count }
     }
 
     /// Counts the cards that are due for review as of a given date, using the same
-    /// box-level logic as `dueForReview`.
+    /// card-level logic as `dueForReview`.
     ///
     /// - Parameter date: The date to evaluate "due" against.
-    /// - Returns: The total number of cards in boxes whose `nextReviewDate` is on or before `date`.
+    /// - Returns: The total number of cards whose own next review date is on or before `date`.
     public func dueCount(asOf date: Date) -> Int {
         let today = Calendar.current.startOfDay(for: date)
         return boxes.reduce(0) { result, box in
-            guard !box.cards.isEmpty else { return result }
-            return Calendar.current.startOfDay(for: box.nextReviewDate) <= today ? result + box.cards.count : result
+            result + box.cards.filter { isDue($0, in: box, asOf: today) }.count
         }
     }
 
@@ -158,11 +188,11 @@ public class LeitnerSystem {
         dueCount(asOf: dateProvider())
     }
 
-    /// The earliest `nextReviewDate` among boxes that still contain cards.
+    /// The earliest next review date among the cards still in the system.
     /// `nil` whenever `dueCount` is greater than zero, since there is nothing to wait for.
     public var nextDueDate: Date? {
         guard dueCount == 0 else { return nil }
-        return boxes.filter { !$0.cards.isEmpty }.map(\.nextReviewDate).min()
+        return boxes.flatMap { box in box.cards.compactMap { nextReviewDate(of: $0, in: box) } }.min()
     }
 
     // Generates review intervals based on the number of boxes
