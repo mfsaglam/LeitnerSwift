@@ -423,16 +423,3 @@ class LeitnerFlowTest: XCTestCase {
         return Date(timeIntervalSince1970: 0)  // Fixed date for testing
     }
 }
-
-extension LeitnerError: Equatable {
-    public static func == (lhs: LeitnerError, rhs: LeitnerError) -> Bool {
-        switch (lhs, rhs) {
-        case (.cardNotFound, .cardNotFound):
-            return true
-        case (.reviewProcessError(let lhsReason), .reviewProcessError(let rhsReason)):
-            return lhsReason == rhsReason
-        default:
-            return false
-        }
-    }
-}
