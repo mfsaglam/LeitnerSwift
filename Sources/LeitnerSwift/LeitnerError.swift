@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum LeitnerError: Error {
+public enum LeitnerError: Error, Equatable {
     case cardNotFound
     case reviewProcessError(reason: String?)
 }

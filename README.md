@@ -31,7 +31,7 @@ Alternatively, you can add it to your `Package.swift` file:
 
 ```swift
 dependencies: [
- .package(url: "https://github.com/mfsaglam/LeitnerSwift.git", from: "1.3.7")
+ .package(url: "https://github.com/mfsaglam/LeitnerSwift.git", from: "1.3.9")
 ]
 ```
 
@@ -50,7 +50,8 @@ let leitnerSystem = LeitnerSystem(boxAmount: 5)
 You can add cards to the system. Cards start in the first box.
 
 ```swift
-let card = Card(id: UUID(), question: "What is the capital of France?", answer: "Paris")
+let word = Word(word: "Capital of France", languageCode: "en", meaning: "Paris")
+let card = Card(id: UUID(), word: word)
 leitnerSystem.addCard(card)
 ```
 

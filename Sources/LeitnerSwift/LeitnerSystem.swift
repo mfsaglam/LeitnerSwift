@@ -55,7 +55,7 @@ public class LeitnerSystem {
     /// If the answer is correct, the card moves to the next box; if incorrect, it moves back to the first box.
     ///
     /// - Parameters:
-    ///   - card: The `Card` object to be updated. This is passed as an inout parameter to allow modification.
+    ///   - card: The `Card` object to be updated.
     ///   - correct: A Boolean indicating whether the user's answer was correct. If `true`, the card progresses to the next box; if `false`, it returns to the first box.
     public func updateCard(_ card: Card, correct: Bool) throws {
         guard !boxes.isEmpty else {
