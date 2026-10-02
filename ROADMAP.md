@@ -26,7 +26,7 @@ yalnızca bu tablo güncellenir.
 | 5 | Due API'sini taşı | Sonnet 5 | `feat/due-query-api` | LeitnerSwift | ✅ DONE |
 | — | **tag `1.4.0`** | — | — | LeitnerSwift | ✅ DONE |
 | 6 | Uygulama yeni API'ye geçsin | Sonnet 5 | `refactor/use-library-due-api` | ⚠️ wordlern | ✅ DONE |
-| 7 | B1: zamanlamayı karta taşı | Opus 5 | `fix/card-level-scheduling` | LeitnerSwift | 🟡 IN PROGRESS |
+| 7 | B1: zamanlamayı karta taşı | Opus 5 | `fix/card-level-scheduling` | LeitnerSwift | ✅ DONE |
 | — | **tag `1.5.0`** | — | — | LeitnerSwift | ⬜ TODO |
 | 8 | Uygulama kart tarihini saklasın | Sonnet 5 | `feat/persist-card-review-date` | ⚠️ wordlern | ⬜ TODO |
 
