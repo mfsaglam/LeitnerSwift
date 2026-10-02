@@ -9,20 +9,25 @@ import Foundation
 
 public class LeitnerSystem {
     private(set) var boxes: [Box]
-    
+    private let dateProvider: () -> Date
+
     /// Initializes the Leitner system with a specified number of boxes.
     /// Each box will have a different review interval based on the Leitner algorithm.
     /// If the provided box amount is less than 2, it defaults to 2 boxes.
     /// Each box starts empty and with its `lastReviewedDate` set to the current date.
     ///
-    /// - Parameter boxAmount: The number of boxes to create. Defaults to 5.
-    ///   Must be at least 2 to ensure the system works as expected.
-    public init(boxAmount: UInt = 5) {
+    /// - Parameters:
+    ///   - boxAmount: The number of boxes to create. Defaults to 5.
+    ///     Must be at least 2 to ensure the system works as expected.
+    ///   - dateProvider: A closure providing the current date. Defaults to `Date()`.
+    ///     Injectable for testing time-dependent behavior.
+    public init(boxAmount: UInt = 5, dateProvider: @escaping () -> Date = { Date() }) {
         let boxCount = max(2, Int(boxAmount))  // Ensure at least 2 boxes
         let reviewIntervals = LeitnerSystem.generateReviewIntervals(for: boxCount)
-        
+        self.dateProvider = dateProvider
+
         boxes = (0..<boxCount).map { index in
-            let initialLastReviewedDate: Date? = Date()
+            let initialLastReviewedDate: Date? = dateProvider()
             return Box(
                 cards: [],
                 reviewInterval: TimeInterval(reviewIntervals[index]),
@@ -97,7 +102,7 @@ public class LeitnerSystem {
     private func updateLastReviewedDateIfNeeded(for boxIndex: Int) {
         // If the box is empty, mark it as reviewed
         if boxes[boxIndex].cards.isEmpty {
-            boxes[boxIndex].lastReviewedDate = Date() // Set the last reviewed date to now
+            boxes[boxIndex].lastReviewedDate = dateProvider() // Set the last reviewed date to now
         }
     }
     
@@ -107,7 +112,7 @@ public class LeitnerSystem {
     /// - Parameter limit: The maximum number of due cards to return. The default value is 10. If more cards are due, only the first `limit` number are returned.
     /// - Returns: An array of `Card` objects that are due for review, limited to the specified `limit`.
     public func dueForReview(limit: Int = 10) throws -> [Card] {
-        let today = Calendar.current.startOfDay(for: Date())
+        let today = Calendar.current.startOfDay(for: dateProvider())
         var dueCards: [Card] = []
         
         for box in boxes.reversed() where Calendar.current.startOfDay(for: box.nextReviewDate) <= today {
