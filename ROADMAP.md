@@ -22,7 +22,7 @@ yalnızca bu tablo güncellenir.
 | 2 | Crash ve mantık hataları | Sonnet 5 | `fix/crashes-and-logic` | LeitnerSwift | ✅ DONE |
 | 3 | `LeitnerError`'ı public yap | Haiku 4.5 | `fix/public-error-type` | LeitnerSwift | ✅ DONE |
 | — | **tag `1.3.9`** | — | — | LeitnerSwift | ✅ DONE |
-| 4 | Zaman enjeksiyonu | Sonnet 5 | `feat/date-provider` | LeitnerSwift | 🟡 IN PROGRESS |
+| 4 | Zaman enjeksiyonu | Sonnet 5 | `feat/date-provider` | LeitnerSwift | ✅ DONE |
 | 5 | Due API'sini taşı | Sonnet 5 | `feat/due-query-api` | LeitnerSwift | ⬜ TODO |
 | — | **tag `1.4.0`** | — | — | LeitnerSwift | ⬜ TODO |
 | 6 | Uygulama yeni API'ye geçsin | Sonnet 5 | `refactor/use-library-due-api` | ⚠️ wordlern | ⬜ TODO |
